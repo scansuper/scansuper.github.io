@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lista de ScanSuper</title>
+<style>
+  body { margin: 0; background: #F6F8F4; color: #38301C; font-family: system-ui, sans-serif; }
+  header { background: #216348; color: #fff; padding: 16px; }
+  header p { margin: 0; font-size: 14px; opacity: .85; }
+  h1 { margin: 4px 0 0; font-size: 22px; overflow-wrap: anywhere; }
+  main { max-width: 480px; margin: 0 auto; padding: 16px; }
+  ul { list-style: none; margin: 0 0 24px; padding: 0; }
+  li { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; gap: 12px; overflow-wrap: anywhere; }
+  .qty { font-weight: 700; color: #216348; min-width: 2.5em; }
+  .btn { display: block; text-align: center; background: #216348; color: #fff; text-decoration: none; padding: 14px; border-radius: 8px; font-weight: 700; }
+  #error { text-align: center; font-size: 18px; padding: 32px 0; }
+</style>
+</head>
+<body>
+<header><p>ScanSuper</p><h1 id="title">Lista compartida</h1></header>
+<main>
+  <p id="error" hidden>Este enlace no es válido</p>
+  <ul id="items"></ul>
+  <a class="btn" href="https://play.google.com/store/apps/details?id=com.scansuper.app">Ábrela en ScanSuper</a>
+</main>
+<script src="lz-string.min.js"></script>
+<script>
+// Misma decodificación que decodeList (scansuper/src/core/share.ts): v === 1, máx. 200 productos, textos de 80.
+function decodeList(frag) {
+  try {
+    if (!frag) return null;
+    var json = LZString.decompressFromEncodedURIComponent(frag);
+    if (!json) return null;
+    var data = JSON.parse(json);
+    if (!data || typeof data !== 'object' || data.v !== 1 || !Array.isArray(data.i)) return null;
+    var name = (typeof data.n === 'string' ? data.n.trim().slice(0, 80) : '') || 'Lista';
+    var items = [];
+    for (var k = 0; k < data.i.length; k++) {
+      if (items.length >= 200) break;
+      var row = data.i[k];
+      if (!Array.isArray(row)) continue;
+      var t = row[0], q = row[1];
+      if (typeof t !== 'string') continue;
+      var text = t.trim().slice(0, 80);
+      if (!text || typeof q !== 'number' || !isFinite(q) || q <= 0) continue;
+      items.push({ text: text, qty: q });
+    }
+    return { name: name, items: items };
+  } catch (e) {
+    return null;
+  }
+}
+var list = decodeList(location.hash.slice(1));
+if (!list) {
+  document.getElementById('error').hidden = false;
+} else {
+  document.getElementById('title').textContent = list.name;
+  var ul = document.getElementById('items');
+  list.items.forEach(function (it) {
+    var li = document.createElement('li');
+    var q = document.createElement('span');
+    q.className = 'qty';
+    q.textContent = it.qty.toLocaleString('es-ES') + ' ×';
+    var s = document.createElement('span');
+    s.textContent = it.text;
+    li.appendChild(q);
+    li.appendChild(s);
+    ul.appendChild(li);
+  });
+}
+</script>
+</body>
+</html>

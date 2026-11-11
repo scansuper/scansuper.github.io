@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.scansuper.app",
+      "sha256_cert_fingerprints": [
+        "47:32:F9:1E:28:22:01:94:CD:FD:FE:1B:78:88:B8:55:7D:62:FA:68:2D:4C:9C:A0:F5:6D:9F:64:9E:01:1A:71",
+        "B7:C8:FF:E6:CF:AF:5F:97:42:18:4A:CE:FE:63:5D:0D:73:63:A2:C0:9C:BF:83:64:14:09:7E:5E:BB:17:D3:B0"
+      ]
+    }
+  }
+]
